@@ -1,0 +1,107 @@
+---
+title: "Celijah_ML3-Naive Bayes"
+Date: Oct. 17, 2019
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+dir.create("images")
+```
+
+***
+
+# Naive Bayes
+
+This code illustrates the Naive Bayes Model.
+
+We will use the e1070 package.
+```{r}
+#Import Packages
+library(dummies)
+library(pROC)
+library("gmodels")
+library(caret)
+library(ISLR)
+#install.packages("e1071") #install first
+library(e1071)  
+library(naivebayes)
+library(dplyr)
+library(ggplot2)
+library(psych)
+a3 <- read.csv("FlightDelays.csv")
+summary(a3)
+#Convert week and time variables to factors 
+a3$time <- as.factor(a3$DEP_TIME)
+a3$day <- as.factor(a3$DAY_WEEK)
+colnames(a3)
+#Select the 5 variables plus Flight.Status
+newdata<-a3[,c(1,2,8,13,14,15)]
+str(newdata)
+```
+
+
+
+```{r}
+
+#1.  Divide the data into 60% training and 40% validation
+set.seed(123)
+Index_Train<-createDataPartition(newdata$Flight.Status, p=0.6, list=FALSE)
+Train <-newdata[Index_Train,]
+Train
+validate  <-newdata[-Index_Train,]
+validate
+```
+
+
+Now, run the Naive Bayes model, and predict Default status on the test set
+```{r}
+#2.	Run the Naive Bayes model to Predict whether flight delayed or not. Use only categorical variables for the predictor variables. Note that Week and Time variables remains as factors
+#First remove Non Categorical Variables
+New_model <- subset(a3,select = -c(CRS_DEP_TIME,DEP_TIME, DISTANCE, FL_DATE, FL_NUM, Weather))
+New_model$DAY_WEEK <- as.factor(New_model$DAY_WEEK)
+New_model$DAY_OF_MONTH <- as.factor(New_model$DAY_OF_MONTH)
+New_model <- transform(New_model, Flight.Status = ifelse(New_model$Flight.Status == "delayed", 1, 0))
+New_model
+```
+
+
+```{r}
+#Q2 Continues: Defining the Naive Bayes Model
+
+set.seed(123)
+nb_model <-naiveBayes(Flight.Status~.,data = Train, usekernel = T)
+Predicted_validate_labels <-predict(nb_model,validate, type = "raw")
+Predicted_validate_labels <- transform(Predicted_validate_labels, Prediction = ifelse(Predicted_validate_labels[,2] > .5, 1, 0))
+Predicted_validate_labels
+```
+
+
+```{r}
+#3. Output both a counts table and a proportion table outlining how many and what proportion of flights were delayed and on-time at each of the three airports.
+ 
+#Creating the Counts and Proporation Table
+
+Table <- a3 %>% 
+    group_by( DEST ) %>% 
+    summarise( count = n(), proportion = n()/length(a3$DEST) )
+
+Table
+
+```
+
+
+
+
+```{r}
+#4.Output the confusion matrix and ROC for the validation data
+
+roc(validate$Flight.Status, Predicted_validate_labels[,2])
+
+plot.roc(validate$Flight.Status,Predicted_validate_labels[,2])
+
+CrossTable(x=validate$Flight.Status,y=Predicted_validate_labels[,3], prop.chisq = FALSE)
+
+```
+
+
+
