@@ -1,0 +1,76 @@
+---
+title: "ML_Assignment1"
+author: "Celijah"
+date: "10/22/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Download a dataset from the web. You may use any source, but specify the source in your code. Also ensure that the data has a mix of quantitative and qualitative (categorical) variables.
+
+```{r } 
+#2.  Import the dataset into R
+# load the CSV file from the local directory
+
+a1 <- read.csv("C:/Users/Stan/Documents/Cars1.csv")
+a1
+
+
+
+```
+
+
+
+```{r}
+#3.  Print out descriptive statistics for a selection of quantitative and categorical variables.
+
+summary(a1, n=10)
+dim(a1)
+
+
+#list type for each attribute
+sapply(a1, class)
+```
+
+
+```{r}
+
+#4.  Transform at least one variable. It doesn't matter what the transformation is
+summary(a1$EngineSize)
+summary(log10(a1$EngineSize + 1))
+summary(sqrt(a1$EngineSize))
+```
+
+
+```{r}
+
+#5.  Plot at least one quantitative variable, and one scatterplot
+# Histogram      
+EngineSize <- a1$EngineSize
+hist(EngineSize)
+```
+
+
+
+
+```{r}
+#Question 5 continues: Plotting scatterplot
+#ScatterPlot
+
+x <- a1$EngineSize
+y <- a1$Price
+# Plot with main and axis titles
+# Change point shape (pch = 19) and remove frame.
+plot(x, y, main = "Scatter Plot of Size Vs Price",
+     xlab = "Engine_Size", ylab = "Price",
+     pch = 19, frame = TRUE)
+
+
+```
+
+
+
+
