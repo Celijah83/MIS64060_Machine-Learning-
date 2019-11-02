@@ -408,22 +408,24 @@ library(caret)</code></pre>
 ##   method             from    
 ##   fitted.fracdiff    fracdiff
 ##   residuals.fracdiff fracdiff</code></pre>
-<p>Answer</p>
 <pre class="r"><code>#Read Data 
 university &lt;- read.csv(&quot;C:/Users/Stan/Documents/Universities.csv&quot;)
 Uni_all &lt;- read.csv(&quot;C:/Users/Stan/Documents/Universities.csv&quot;)
 
-#Answer
+# A. Response:
 # remove rows with missing measurement from Universities dataset.
 university &lt;- na.omit(university)
 Clean_Uni &lt;- university</code></pre>
 </div>
-<div id="for-all-the-continuous-measurements-run-k-means-clustering.-make-sure-to-normalize-the-measurements.-how-many-clusters-seem-reasonable-for-describing-these-data-what-was-your-optimal-k" class="section level2">
-<h2>2. For all the continuous measurements, run K-Means clustering. Make sure to normalize the measurements. How many clusters seem reasonable for describing these data? What was your optimal K?</h2>
+<div id="b.-for-all-the-continuous-measurements-run-k-means-clustering.-make-sure-to-normalize-the-measurements.-how-many-clusters-seem-reasonable-for-describing-these-data-what-was-your-optimal-k" class="section level2">
+<h2>B. For all the continuous measurements, run K-Means clustering. Make sure to normalize the measurements. How many clusters seem reasonable for describing these data? What was your optimal K?</h2>
 <pre class="r"><code>#Data Preprocessing
 library(ggplot2)
 set.seed(123)
 norm &lt;- preProcess(university[, c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)], method=c(&quot;center&quot;, &quot;scale&quot;))
+
+norm_Tufts &lt;- preProcess(university[, c(4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)], method=c(&quot;center&quot;, &quot;scale&quot;))
+
 university[, c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)] &lt;- predict(norm, university[, c(4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)])</code></pre>
 </div>
 <div id="runing-k-means-clustering-on-continuous-variables-to-determine-the-number-of-cluster-that-seems-reasonable-and-optimal-k." class="section level1">
@@ -447,9 +449,8 @@ fviz_dist(distance)</code></pre>
 <pre class="r"><code>#Defining the algorithmn for k of 10 and 15
 set.seed(123)
 k5 &lt;- kmeans(uni_con, centers = 5, nstart = 25)
-k15 &lt;- kmeans(uni_con, centers = 15, nstart = 25)
-
-#Getting the Size and Center for the Clusters
+k15 &lt;- kmeans(uni_con, centers = 15, nstart = 25)</code></pre>
+<pre class="r"><code>#Getting the Size and Center for the Clusters
 set.seed(123)
 k5$centers</code></pre>
 <pre><code>##   X..appli..rec.d X..appl..accepted X..new.stud..enrolled
@@ -526,9 +527,8 @@ fviz_cluster(k5, data = uni_con)</code></pre>
 <pre class="r"><code>#Using Other Distances 
 set.seed(123)
 k5_median = kcca(uni_con, k=5, kccaFamily(&quot;kmedians&quot;))
-k15_median = kcca(uni_con, k=15, kccaFamily(&quot;kmedians&quot;))
-
-#Creating the cluster index
+k15_median = kcca(uni_con, k=15, kccaFamily(&quot;kmedians&quot;))</code></pre>
+<pre class="r"><code>#Creating the cluster index
 set.seed(123)
 clusters_index_5 &lt;- predict(k5_median)
 clusters_index_15 &lt;- predict(k15_median)
@@ -595,13 +595,8 @@ set.seed(123)
 clusters &lt;- data.frame(clusters_index_3)
 clean_Uni &lt;- cbind(Clean_Uni, clusters)
 clean_Uni$room_board_fees &lt;- clean_Uni$room + clean_Uni$board + clean_Uni$add..fees + clean_Uni$estim..book.costs + clean_Uni$estim..personal..</code></pre>
-<div id="compare-the-summary-statistics-for-each-cluster-and-describe-each-cluster-in-this-context-e.g.-universities-with-high-tuition-low-acceptance-rate." class="section level2">
-<h2>3. Compare the summary statistics for each cluster and describe each cluster in this context (e.g., Universities with high tuition, low acceptance rate…).</h2>
-<p>Answer:Based on table 1 (Summary_cont) which contains information on all data in the clusters: (a) The mean graduation rate is lowest for cluster 1. (b) The mean student to faculty ratio is lowest for cluster 2. (c) The mean PHD faculty ratio is lowest for cluster 3. (d) The mean room, board, and fees is lowest for cluster 3. (e) The average in state tuition is lowest for cluster 1. (f) The out of state tuition is lowest for 1. (g) The acceptance rate is lowest for cluster 2.</p>
-<p>Based on table 2 (Summary_cont_priv): (a) Acceptant rate is highest for cluter 3. (b) Avg_out_state_tuition is highest for cluster 2. (c) Avg_int_state_tuition is highest for cluster 2. (d) room_board_fees is highest for cluster 2.<br />
-(e) mean_PHD_fac is highest for cluster 2. (f) mean_stud_fac_ratio is highest for cluster 1. (g) mean_grad_rate is highest for cluster 2.</p>
-<p>Based on table 3 (Summary_cont_pub): (a) Acceptant rate is highest for cluter 3. (b) Avg_out_state_tuition is highest for cluster 2. (c) Avg_int_state_tuition is highest for cluster 2. (d) room_board_fees is highest for cluster 2.<br />
-(e) mean_PHD_fac is highest for cluster 2. (f) mean_stud_fac_ratio is highest for cluster 1. (g) mean_grad_rate is highest for cluster 2.</p>
+<div id="c.-compare-the-summary-statistics-for-each-cluster-and-describe-each-cluster-in-this-context-e.g.-universities-with-high-tuition-low-acceptance-rate." class="section level2">
+<h2>C. Compare the summary statistics for each cluster and describe each cluster in this context (e.g., Universities with high tuition, low acceptance rate…).</h2>
 <pre class="r"><code>#Summary Statistics for Each Cluster
 set.seed(123)
 Summary_cont &lt;- clean_Uni %&gt;% 
@@ -617,6 +612,7 @@ Summary_cont</code></pre>
 ## # ... with 6 more variables: room_board_fees &lt;dbl&gt;, mean_PHD_fac &lt;dbl&gt;,
 ## #   mean_stud_fac_ratio &lt;dbl&gt;, mean_grad_rate &lt;dbl&gt;, priv_count &lt;int&gt;,
 ## #   pub_count &lt;int&gt;</code></pre>
+<p>Answer:Based on table 1 (Summary_cont) which contains information on all the three clusters combined (i.e. cluster1, cluster2, and cluster 3): (a) The mean graduation rate is lowest for cluster 1. (b) The mean student to faculty ratio is lowest for cluster 2. (c) The mean PHD faculty ratio is lowest for cluster 3. (d) The mean room, board, and fees is lowest for cluster 3. (e) The average in state tuition is lowest for cluster 1. (f) The out of state tuition is lowest for 1. (g) The acceptance rate is lowest for cluster 2.</p>
 <pre class="r"><code>#Private
 Summary_cont_priv &lt;- clean_Uni %&gt;% filter(Public..1...Private..2. == 2) %&gt;%
     group_by( clusters_index_3 ) %&gt;%
@@ -630,6 +626,8 @@ Summary_cont_priv</code></pre>
 ## 3                3           0.782            9994.            9995.
 ## # ... with 4 more variables: room_board_fees &lt;dbl&gt;, mean_PHD_fac &lt;dbl&gt;,
 ## #   mean_stud_fac_ratio &lt;dbl&gt;, mean_grad_rate &lt;dbl&gt;</code></pre>
+<p>Based on table 2 (Summary_cont_priv): (a) Acceptant rate is highest for cluter 3 in the private school. (b) Avg_out_state_tuition is highest for cluster 2 in the private school. (c) Avg_int_state_tuition is highest for cluster 2 in the private school. (d) room_board_fees is highest for cluster 2 in the private school. (e) mean_PHD_fac is highest for cluster 2 in the private school.<br />
+(f) mean_stud_fac_ratio is highest for cluster 1 in the private school. (g) mean_grad_rate is highest for cluster 2 in the private school.</p>
 <pre class="r"><code>#Public
 Summary_cont_pub &lt;- clean_Uni %&gt;% filter(Public..1...Private..2. == 1) %&gt;%
     group_by( clusters_index_3 ) %&gt;%
@@ -643,48 +641,50 @@ Summary_cont_pub</code></pre>
 ## 3                3           0.728            5688.            2080.
 ## # ... with 4 more variables: room_board_fees &lt;dbl&gt;, mean_PHD_fac &lt;dbl&gt;,
 ## #   mean_stud_fac_ratio &lt;dbl&gt;, mean_grad_rate &lt;dbl&gt;</code></pre>
+<p>Based on table 3 (Summary_cont_pub): (a) Acceptant rate is highest for cluter 3 in public school. (b) Avg_out_state_tuition is highest for cluster 2 in public school. (c) Avg_int_state_tuition is highest for cluster 2 in public school. (d) room_board_fees is highest for cluster 2 in public school. (e) mean_PHD_fac is highest for cluster 2 in public school. (f) mean_stud_fac_ratio is highest for cluster 1 in public school. (g) mean_grad_rate is highest for cluster 2 in public school.</p>
 <pre class="r"><code>#centers for clusters
 k3 &lt;- kmeans(uni_con, centers = 3, nstart = 25)</code></pre>
 </div>
-<div id="use-the-categorical-measurements-that-were-not-used-in-the-analysis-state-and-privatepublic-to-characterize-the-different-clusters.-is-there-any-relationship-between-the-clusters-and-the-categorical-information" class="section level2">
-<h2>4. Use the categorical measurements that were not used in the analysis (State and Private/Public) to characterize the different clusters. Is there any relationship between the clusters and the categorical information?</h2>
+<div id="d.-use-the-categorical-measurements-that-were-not-used-in-the-analysis-state-and-privatepublic-to-characterize-the-different-clusters.-is-there-any-relationship-between-the-clusters-and-the-categorical-information" class="section level2">
+<h2>D. Use the categorical measurements that were not used in the analysis (State and Private/Public) to characterize the different clusters. Is there any relationship between the clusters and the categorical information?</h2>
 <p>Answer: There is a relationship between the categorical variable, because cluster 3 seems to be the only cluster with a majority public schools which explains the low average tution rates.</p>
-<pre class="r"><code>#4.There is a relationship between the categorical variable, because cluster 3 seems to be the only cluster with a majority public schools which explains the low average tution rates.</code></pre>
+<pre class="r"><code>#D.There is a relationship between the categorical variable, because cluster 3 seems to be the only cluster with a majority public schools which explains the low average tution rates.</code></pre>
 </div>
-<div id="what-other-external-information-can-explain-the-contents-of-some-or-all-of-these-clusters" class="section level2">
-<h2>5. What other external information can explain the contents of some or all of these clusters?</h2>
+<div id="e.-what-other-external-information-can-explain-the-contents-of-some-or-all-of-these-clusters" class="section level2">
+<h2>E. What other external information can explain the contents of some or all of these clusters?</h2>
 <p>Answer: There are couple of factors that can aid the explanation on the contents of some of the clusters.Namely: a) the state of the school b) the operating budget of the university c) the amount of academic endowments of the university.</p>
 <pre class="r"><code>#See Answer above</code></pre>
 </div>
-<div id="consider-tufts-university-which-is-missing-some-information.-compute-the-euclidean-distance-of-this-record-from-each-of-the-clusters-that-you-found-above-using-only-the-measurements-that-you-have.-which-cluster-is-it-closest-to-impute-the-missing-values-for-tufts-by-taking-the-average-of-the-cluster-on-those-measurements." class="section level2">
-<h2>6. Consider Tufts University, which is missing some information. Compute the Euclidean distance of this record from each of the clusters that you found above (using only the measurements that you have). Which cluster is it closest to? Impute the missing values for Tufts by taking the average of the cluster on those measurements.</h2>
-<p>Answer: Cluster 1 has the lowest distance from Tufts Please see output below.</p>
-<pre class="r"><code>#f. Isolating the data to Tufts University
+<div id="f.-consider-tufts-university-which-is-missing-some-information.-compute-the-euclidean-distance-of-this-record-from-each-of-the-clusters-that-you-found-above-using-only-the-measurements-that-you-have.-which-cluster-is-it-closest-to-impute-the-missing-values-for-tufts-by-taking-the-average-of-the-cluster-on-those-measurements." class="section level2">
+<h2>F. Consider Tufts University, which is missing some information. Compute the Euclidean distance of this record from each of the clusters that you found above (using only the measurements that you have). Which cluster is it closest to? Impute the missing values for Tufts by taking the average of the cluster on those measurements.</h2>
+<p>Answer: Cluster 2 has the lowest distance from Tufts Please see output below.</p>
+<pre class="r"><code>#F. Isolating the data to Tufts University
 
 library(dplyr)
 library(stats)
 
 Tufts &lt;- filter(Uni_all, College.Name == &quot;Tufts University&quot;)
+Tufts[, -c(1, 2, 3, 10)] &lt;- predict(norm_Tufts, Tufts[, -c(1, 2, 3, 10)])
 
-#Euclidean Distance for Each Clusters it is clear that cluster 1 has the lowest distance from Tufts
+#Euclidean Distance for Each Clusters: 
 #Cluster 1
 dist(rbind(Tufts[, -c(1, 2, 3, 10)], k3$centers[1,]))</code></pre>
 <pre><code>##          1
-## 2 29816.76</code></pre>
+## 2 6.053061</code></pre>
 <pre class="r"><code>#Cluster 2
 dist(rbind(Tufts[, -c(1, 2, 3, 10)], k3$centers[2,]))</code></pre>
-<pre><code>##         1
-## 2 29817.8</code></pre>
+<pre><code>##          1
+## 2 4.695208</code></pre>
 <pre class="r"><code>#Cluster 3
 dist(rbind(Tufts[, -c(1, 2, 3, 10)], k3$centers[3,]))</code></pre>
 <pre><code>##          1
-## 2 29819.09</code></pre>
-<pre class="r"><code>#Impute NAs with average from cluster 1
-cluster_1 &lt;- filter(clean_Uni, clusters_index_3 == 1)
-avg_cluster_1 &lt;- mean(cluster_1[,c(10)])
-Tufts[, c(10)] &lt;- avg_cluster_1
+## 2 5.894766</code></pre>
+<pre class="r"><code>#Impute NAs with average from cluster 2
+cluster_2 &lt;- filter(clean_Uni, clusters_index_3 == 2)
+avg_cluster_2 &lt;- mean(cluster_2[,c(10)])
+Tufts[, c(10)] &lt;- avg_cluster_2
 Tufts[, c(10)]</code></pre>
-<pre><code>## [1] 2260.721</code></pre>
+<pre><code>## [1] 285.6195</code></pre>
 </div>
 </div>
 
@@ -706,7 +706,7 @@ $(document).ready(function () {
 
 </script>
 
-<!-- tabsets -->
+<!---- tabsets ---->
 
 <script>
 $(document).ready(function () {
@@ -720,10 +720,10 @@ $(document).ready(function () {
 });
 </script>
 
-<!-- code folding -->
+<!---- code folding ---->
 
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
+<!---- dynamically load mathjax for compatibility with self-contained ---->
 <script>
   (function () {
     var script = document.createElement("script");
