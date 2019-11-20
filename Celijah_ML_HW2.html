@@ -367,21 +367,11 @@ summary {
 
 
 <p>#Installing all the necssary packages</p>
-<pre class="r"><code>#Imports
-#install.packages(&quot;caret&quot;)
-#install.packages(&quot;FNN&quot;)
-#install.packages(&quot;gmodels&quot;)
+<pre class="r"><code>library(ISLR)
 library(caret)</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
 <pre><code>## Loading required package: ggplot2</code></pre>
-<pre class="r"><code>library(lattice)
-library(ISLR)
-
-# install.packages(&quot;ISLR&quot;) # only install if needed
-
-library(caret)
-library(ISLR)
-library(dplyr)</code></pre>
+<pre class="r"><code>library(dplyr)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;dplyr&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:stats&#39;:
@@ -390,46 +380,33 @@ library(dplyr)</code></pre>
 <pre><code>## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(ggplot2)
-library(FNN)
-library(class)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;class&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:FNN&#39;:
-## 
-##     knn, knn.cv</code></pre>
-<pre class="r"><code>library(dummies)</code></pre>
-<pre><code>## dummies-1.5.6 provided by Decision Patterns</code></pre>
-<pre class="r"><code>library(gmodels)
-library(e1071)</code></pre>
+<pre class="r"><code>library(FNN)
+library(gmodels)</code></pre>
 <p>#Reading the file</p>
 <pre class="r"><code>#reading the file
-ml &lt;- read.csv(&#39;UniversalBank.csv&#39;)
-ml$Education &lt;- sapply(ml$Education, as.character)
-head(ml,10)</code></pre>
-<pre><code>##    ID Age Experience Income ZIP.Code Family CCAvg Education Mortgage
-## 1   1  25          1     49    91107      4   1.6         1        0
-## 2   2  45         19     34    90089      3   1.5         1        0
-## 3   3  39         15     11    94720      1   1.0         1        0
-## 4   4  35          9    100    94112      1   2.7         2        0
-## 5   5  35          8     45    91330      4   1.0         2        0
-## 6   6  37         13     29    92121      4   0.4         2      155
-## 7   7  53         27     72    91711      2   1.5         2        0
-## 8   8  50         24     22    93943      1   0.3         3        0
-## 9   9  35         10     81    90089      3   0.6         2      104
-## 10 10  34          9    180    93023      1   8.9         3        0
-##    Personal.Loan Securities.Account CD.Account Online CreditCard
-## 1              0                  1          0      0          0
-## 2              0                  1          0      0          0
-## 3              0                  0          0      0          0
-## 4              0                  0          0      0          0
-## 5              0                  0          0      0          1
-## 6              0                  0          0      1          0
-## 7              0                  0          0      1          0
-## 8              0                  0          0      0          1
-## 9              0                  0          0      1          0
-## 10             1                  0          0      0          0</code></pre>
-<pre class="r"><code>#Summary Statistics
+
+ml &lt;- read.csv(&#39;UniversalBank.csv&#39;)</code></pre>
+<p>Summarize the dataset for review</p>
+<pre class="r"><code># View the structure of the data set
+
+str(ml)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    5000 obs. of  14 variables:
+##  $ ID                : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ Age               : int  25 45 39 35 35 37 53 50 35 34 ...
+##  $ Experience        : int  1 19 15 9 8 13 27 24 10 9 ...
+##  $ Income            : int  49 34 11 100 45 29 72 22 81 180 ...
+##  $ ZIP.Code          : int  91107 90089 94720 94112 91330 92121 91711 93943 90089 93023 ...
+##  $ Family            : int  4 3 1 1 4 4 2 1 3 1 ...
+##  $ CCAvg             : num  1.6 1.5 1 2.7 1 0.4 1.5 0.3 0.6 8.9 ...
+##  $ Education         : int  1 1 1 2 2 2 2 3 2 3 ...
+##  $ Mortgage          : int  0 0 0 0 0 155 0 0 104 0 ...
+##  $ Personal.Loan     : int  0 0 0 0 0 0 0 0 0 1 ...
+##  $ Securities.Account: int  1 1 0 0 0 0 0 0 0 0 ...
+##  $ CD.Account        : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Online            : int  0 0 0 0 0 1 1 0 1 0 ...
+##  $ CreditCard        : int  0 0 0 0 1 0 0 1 0 0 ...</code></pre>
+<pre class="r"><code># View summary statistics for the data set
+
 summary(ml)</code></pre>
 <pre><code>##        ID            Age          Experience       Income      
 ##  Min.   :   1   Min.   :23.00   Min.   :-3.0   Min.   :  8.00  
@@ -438,13 +415,13 @@ summary(ml)</code></pre>
 ##  Mean   :2500   Mean   :45.34   Mean   :20.1   Mean   : 73.77  
 ##  3rd Qu.:3750   3rd Qu.:55.00   3rd Qu.:30.0   3rd Qu.: 98.00  
 ##  Max.   :5000   Max.   :67.00   Max.   :43.0   Max.   :224.00  
-##     ZIP.Code         Family          CCAvg         Education        
-##  Min.   : 9307   Min.   :1.000   Min.   : 0.000   Length:5000       
-##  1st Qu.:91911   1st Qu.:1.000   1st Qu.: 0.700   Class :character  
-##  Median :93437   Median :2.000   Median : 1.500   Mode  :character  
-##  Mean   :93153   Mean   :2.396   Mean   : 1.938                     
-##  3rd Qu.:94608   3rd Qu.:3.000   3rd Qu.: 2.500                     
-##  Max.   :96651   Max.   :4.000   Max.   :10.000                     
+##     ZIP.Code         Family          CCAvg          Education    
+##  Min.   : 9307   Min.   :1.000   Min.   : 0.000   Min.   :1.000  
+##  1st Qu.:91911   1st Qu.:1.000   1st Qu.: 0.700   1st Qu.:1.000  
+##  Median :93437   Median :2.000   Median : 1.500   Median :2.000  
+##  Mean   :93153   Mean   :2.396   Mean   : 1.938   Mean   :1.881  
+##  3rd Qu.:94608   3rd Qu.:3.000   3rd Qu.: 2.500   3rd Qu.:3.000  
+##  Max.   :96651   Max.   :4.000   Max.   :10.000   Max.   :3.000  
 ##     Mortgage     Personal.Loan   Securities.Account   CD.Account    
 ##  Min.   :  0.0   Min.   :0.000   Min.   :0.0000     Min.   :0.0000  
 ##  1st Qu.:  0.0   1st Qu.:0.000   1st Qu.:0.0000     1st Qu.:0.0000  
@@ -459,408 +436,392 @@ summary(ml)</code></pre>
 ##  Mean   :0.5968   Mean   :0.294  
 ##  3rd Qu.:1.0000   3rd Qu.:1.000  
 ##  Max.   :1.0000   Max.   :1.000</code></pre>
-<pre class="r"><code>#Creating Dummy variables
-ml &lt;- dummy.data.frame(ml, names=c(&quot;Education&quot;),sep = &quot;.&quot;)</code></pre>
-<pre><code>## Warning in model.matrix.default(~x - 1, model.frame(~x - 1), contrasts =
-## FALSE): non-list contrasts argument ignored</code></pre>
-<pre class="r"><code>head(ml)</code></pre>
-<pre><code>##   ID Age Experience Income ZIP.Code Family CCAvg Education.1 Education.2
-## 1  1  25          1     49    91107      4   1.6           1           0
-## 2  2  45         19     34    90089      3   1.5           1           0
-## 3  3  39         15     11    94720      1   1.0           1           0
-## 4  4  35          9    100    94112      1   2.7           0           1
-## 5  5  35          8     45    91330      4   1.0           0           1
-## 6  6  37         13     29    92121      4   0.4           0           1
-##   Education.3 Mortgage Personal.Loan Securities.Account CD.Account Online
-## 1           0        0             0                  1          0      0
-## 2           0        0             0                  1          0      0
-## 3           0        0             0                  0          0      0
-## 4           0        0             0                  0          0      0
-## 5           0        0             0                  0          0      0
-## 6           0      155             0                  0          0      1
-##   CreditCard
-## 1          0
-## 2          0
-## 3          0
-## 4          0
-## 5          1
-## 6          0</code></pre>
-<pre class="r"><code>#Taking Out ID and Zip
-Model &lt;- subset(ml,select = -c(ID,ZIP.Code))
+<p>Remove the “ID” and “ZIP.Code” variables from the data set.</p>
+<pre class="r"><code># Create a new data set with &quot;ID&quot; and &quot;ZIP.Code&quot; variables removed
 
-#Summary Statistics for the New Data Frame
-summary(Model)</code></pre>
-<pre><code>##       Age          Experience       Income           Family     
-##  Min.   :23.00   Min.   :-3.0   Min.   :  8.00   Min.   :1.000  
-##  1st Qu.:35.00   1st Qu.:10.0   1st Qu.: 39.00   1st Qu.:1.000  
-##  Median :45.00   Median :20.0   Median : 64.00   Median :2.000  
-##  Mean   :45.34   Mean   :20.1   Mean   : 73.77   Mean   :2.396  
-##  3rd Qu.:55.00   3rd Qu.:30.0   3rd Qu.: 98.00   3rd Qu.:3.000  
-##  Max.   :67.00   Max.   :43.0   Max.   :224.00   Max.   :4.000  
-##      CCAvg         Education.1      Education.2      Education.3    
-##  Min.   : 0.000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
-##  1st Qu.: 0.700   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000  
-##  Median : 1.500   Median :0.0000   Median :0.0000   Median :0.0000  
-##  Mean   : 1.938   Mean   :0.4192   Mean   :0.2806   Mean   :0.3002  
-##  3rd Qu.: 2.500   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
-##  Max.   :10.000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
-##     Mortgage     Personal.Loan   Securities.Account   CD.Account    
-##  Min.   :  0.0   Min.   :0.000   Min.   :0.0000     Min.   :0.0000  
-##  1st Qu.:  0.0   1st Qu.:0.000   1st Qu.:0.0000     1st Qu.:0.0000  
-##  Median :  0.0   Median :0.000   Median :0.0000     Median :0.0000  
-##  Mean   : 56.5   Mean   :0.096   Mean   :0.1044     Mean   :0.0604  
-##  3rd Qu.:101.0   3rd Qu.:0.000   3rd Qu.:0.0000     3rd Qu.:0.0000  
-##  Max.   :635.0   Max.   :1.000   Max.   :1.0000     Max.   :1.0000  
-##      Online         CreditCard   
-##  Min.   :0.0000   Min.   :0.000  
-##  1st Qu.:0.0000   1st Qu.:0.000  
-##  Median :1.0000   Median :0.000  
-##  Mean   :0.5968   Mean   :0.294  
-##  3rd Qu.:1.0000   3rd Qu.:1.000  
-##  Max.   :1.0000   Max.   :1.000</code></pre>
-<pre class="r"><code>#CAN ALSO BE DONE THIS WAY: Taking out ID and Zip
-#Model &lt;- subset(ml,select= c(-1,-5))
-#Summary Statistics for the new data frame
-#summary(Model)</code></pre>
-<pre class="r"><code>#Creating Training and Test Sets
-set.seed(15)
-Test_Index = createDataPartition(Model$Age,p=0.4, list=FALSE) # 40% reserved for Test
-Test_Data = Model[Test_Index,]
-Test_Data[, 10] = sapply(Test_Data[, 10], as.factor)
-Train_Data = Model[-Test_Index,] # Validation and Training data is rest
-Train_Data[, 10] = sapply(Train_Data[, 10], as.factor)</code></pre>
-<div id="response-to-question-1-according-to-the-knn-output-this-customer-would-be-classified-as-accepting-the-personal-loan-offer-with-parameter-k-held-constant-at-1.-the-accuracy-is-95.-see-the-code-and-output-below." class="section level1">
-<h1>Response to question 1: According to the KNN output, this customer would be classified as accepting the personal loan offer with parameter k held constant at 1. The accuracy is 95%. See the code and output below.</h1>
-<pre class="r"><code>###First Model for k=1
-set.seed(15)
-Search_grid &lt;- expand.grid(k=c(1))
+ml_1 &lt;- ml[ ,-c(1,5)]
 
-#Training and Test Sets
-Train_Predictors&lt;-Train_Data[,-10] 
-Test_Predictors&lt;-Test_Data[,-10]
+# Review the structure of the data set 
 
-Train_targets &lt;- sapply(Train_Data[,10], as.factor)
-Test_targets  &lt;- sapply(Test_Data[,10], as.factor)
+str(ml_1)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    5000 obs. of  12 variables:
+##  $ Age               : int  25 45 39 35 35 37 53 50 35 34 ...
+##  $ Experience        : int  1 19 15 9 8 13 27 24 10 9 ...
+##  $ Income            : int  49 34 11 100 45 29 72 22 81 180 ...
+##  $ Family            : int  4 3 1 1 4 4 2 1 3 1 ...
+##  $ CCAvg             : num  1.6 1.5 1 2.7 1 0.4 1.5 0.3 0.6 8.9 ...
+##  $ Education         : int  1 1 1 2 2 2 2 3 2 3 ...
+##  $ Mortgage          : int  0 0 0 0 0 155 0 0 104 0 ...
+##  $ Personal.Loan     : int  0 0 0 0 0 0 0 0 0 1 ...
+##  $ Securities.Account: int  1 1 0 0 0 0 0 0 0 0 ...
+##  $ CD.Account        : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Online            : int  0 0 0 0 0 1 1 0 1 0 ...
+##  $ CreditCard        : int  0 0 0 0 1 0 0 1 0 0 ...</code></pre>
+<p>We will create dummy variables for categorical variables with more than two categories. Therefore, we will create dummy variables for “Family” and “Education”.</p>
+<pre class="r"><code># Convert &quot;Education&quot; and &quot;Family&quot; variables to categorical character variables
 
-norm &lt;- preProcess(Train_Predictors[, c(1, 2, 3, 4, 5, 9)], method=c(&quot;center&quot;, &quot;scale&quot;))
+ml_1$Education &lt;- as.factor(ml_1$Education)
+ml_1$Family &lt;- as.factor(ml_1$Family)
 
-Train_Predictors[, c(1, 2, 3, 4, 5, 9)] &lt;- predict(norm, Train_Predictors[, c(1, 2, 3, 4, 5, 9)])
+# Create the dummy model for &quot;Education&quot; and &quot;Family&quot;
 
-#Model
-TT &lt;- train(Train_Predictors, Train_targets, preProcess = c(&quot;scale&quot;, &quot;center&quot;), method=&quot;knn&quot;, tuneGrid=Search_grid)
+dummy_model1 &lt;- dummyVars(~Family + Education, data = ml_1)
 
-#Predictions Test Set
-Test_Predictions &lt;- predict(TT, Test_Predictors)
 
-#Predictions Customer 
+#Next we add the dummy variables to &quot;ml_1&quot; while we drop the original &quot;Education&quot; and &quot;Family&quot; variables.
 
-Customer &lt;- data.frame(Age = 40, Experience = 10, Income = 84, Family = 2, CCAvg = 2, Education.1 = 0, Education.2 = 1, Education.3 = 0, Mortgage = 0, Securities.Account = 0, CD.Account = 0, Online = 1, CreditCard = 1, stringsAsFactors = FALSE)
-predictions_1st_Customer &lt;- predict(TT, Customer)
+ce &lt;- as.data.frame(predict(dummy_model1, ml_1))
+ml_1 &lt;- as.data.frame(c(ml_1, ce))
+ml_1 &lt;- ml_1[, -c(4,6)]</code></pre>
+<p>Creating Training and Test sets required that we split the data set into 60% training and 40% test data using the “createDataPartition” function.</p>
+<pre class="r"><code># Set the seed for randomized functions
 
-#Scores for the First Model Test Set
-#Accuracy
-#accuracy(Test_Predictions, Test_targets)
+set.seed(100319)
 
-TT</code></pre>
-<pre><code>## k-Nearest Neighbors 
+# Split the data into 60% training data and 40% test data
+
+ml_1_Index &lt;- createDataPartition(ml_1$Age, p=0.4, list = F)
+
+ml_1_Test &lt;- ml_1[ml_1_Index,]
+
+ml_1_Train &lt;- ml_1[-ml_1_Index,] </code></pre>
+<p>Now, before proceeding we have to normalize the training and test data sets using the “preProcess” function.</p>
+<pre class="r"><code># Creating copy of the dataset for normalization
+
+ml_1_Train_Norm &lt;- ml_1_Train
+ml_1_Test_Norm &lt;- ml_1_Test
+
+# For centering and scaling the data we will create a model using preProcess function 
+
+Norm_Values &lt;- preProcess(ml_1_Train[, c(1:5)], method = c(&quot;center&quot;, &quot;scale&quot;))
+
+# Next, we will now replace the numeric variables with normalized and centered data
+
+ml_1_Train_Norm[, c(1:5)] &lt;- predict(Norm_Values, ml_1_Train[, c(1:5)])
+ml_1_Test_Norm[, c(1:5)] &lt;- predict(Norm_Values, ml_1_Test[, c(1:5)])</code></pre>
+<p>Using the KNN function next.</p>
+<pre class="r"><code># Create the KNN model with K = 1 and only training and test data
+
+
+knn_model2 &lt;- knn(train = ml_1_Train_Norm[, -6], test = ml_1_Test_Norm[, -6], 
+         cl = ml_1_Train_Norm[, 6], k = 1, prob = TRUE)</code></pre>
+<pre class="r"><code>head(ml_1)</code></pre>
+<pre><code>##   Age Experience Income CCAvg Mortgage Personal.Loan Securities.Account
+## 1  25          1     49   1.6        0             0                  1
+## 2  45         19     34   1.5        0             0                  1
+## 3  39         15     11   1.0        0             0                  0
+## 4  35          9    100   2.7        0             0                  0
+## 5  35          8     45   1.0        0             0                  0
+## 6  37         13     29   0.4      155             0                  0
+##   CD.Account Online CreditCard Family.1 Family.2 Family.3 Family.4
+## 1          0      0          0        0        0        0        1
+## 2          0      0          0        0        0        1        0
+## 3          0      0          0        1        0        0        0
+## 4          0      0          0        1        0        0        0
+## 5          0      0          1        0        0        0        1
+## 6          0      1          0        0        0        0        1
+##   Education.1 Education.2 Education.3
+## 1           1           0           0
+## 2           1           0           0
+## 3           1           0           0
+## 4           0           1           0
+## 5           0           1           0
+## 6           0           1           0</code></pre>
+<pre class="r"><code># Problem #1 require customer profile to be created with all the details provided below
+
+customer &lt;- data.frame(&quot;Age&quot; = 40,
+                       &quot;Experience&quot; = 10,
+                       &quot;Income&quot; = 84,
+                       &quot;CCAvg&quot; = 2,
+                       &quot;Mortgage&quot; = 0,
+                       &quot;Securities.Account&quot; = 0,
+                       &quot;CD.Account&quot; = 0,
+                       &quot;Online&quot; = 1,
+                       &quot;CreditCard&quot; = 1,
+                       &quot;Family.1&quot; = 0,
+                       &quot;Family.2&quot; = 1,
+                       &quot;Family.3&quot; = 0,
+                       &quot;Family.4&quot; = 0,
+                       &quot;Education.1&quot; = 0,
+                       &quot;Education.2&quot; = 1,
+                       &quot;Education.3&quot; = 0)
+
+# Next, we will repeat the preProcessing steps on this customer profile model 
+
+customer[, c(1:5)] &lt;- predict(Norm_Values, customer[, c(1:5)])
+
+# Runing the KNN model on the customer profile
+
+knn_model_customer &lt;- knn(train = ml_1_Train_Norm[, -6], test = customer, 
+          cl = ml_1_Train_Norm[, 6], k = 1, prob = TRUE)
+
+# Return the value predicted by the model
+
+as.data.frame(knn_model_customer)</code></pre>
+<pre><code>##   knn_model_customer
+## 1                  0</code></pre>
+<p>Response to question 1: According to the KNN model prediction, this customer would be classified as not accepting the personal loan.</p>
+<pre class="r"><code># I Creating data frame with two columns - k, and accuracy
+
+accuracy.df &lt;- data.frame(k = seq(1, 30, 1), accuracy = rep(0, 30))
+
+# At different K values make predictions via KNN
+
+for(i in 1:30) {
+  knn.pred &lt;- knn(train = ml_1_Train_Norm[, -6], test = ml_1_Test_Norm[, -6], 
+          cl = ml_1_Train_Norm[, 6], k = i)
+  accuracy.df[i, 2] &lt;- confusionMatrix(as.factor(knn.pred), as.factor(ml_1_Test_Norm[, 6]))$overall[1] 
+}
+
+# Displaying results in a data frame
+
+accuracy.df</code></pre>
+<pre><code>##     k  accuracy
+## 1   1 0.9645177
+## 2   2 0.9540230
+## 3   3 0.9635182
+## 4   4 0.9540230
+## 5   5 0.9595202
+## 6   6 0.9505247
+## 7   7 0.9565217
+## 8   8 0.9500250
+## 9   9 0.9555222
+## 10 10 0.9500250
+## 11 11 0.9520240
+## 12 12 0.9460270
+## 13 13 0.9485257
+## 14 14 0.9445277
+## 15 15 0.9490255
+## 16 16 0.9430285
+## 17 17 0.9440280
+## 18 18 0.9400300
+## 19 19 0.9435282
+## 20 20 0.9375312
+## 21 21 0.9415292
+## 22 22 0.9385307
+## 23 23 0.9410295
+## 24 24 0.9370315
+## 25 25 0.9390305
+## 26 26 0.9370315
+## 27 27 0.9405297
+## 28 28 0.9370315
+## 29 29 0.9390305
+## 30 30 0.9365317</code></pre>
+<pre class="r"><code># In other to view the trend in the data, we will make a Rough plot of the accuracies 
+
+plot(x = accuracy.df$k,y = accuracy.df$accuracy, main = &quot;Plot of Accuracy Values vs K&quot;, xlab = &quot;K Value&quot;, ylab = &quot;Accuracy&quot;)</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<p>Response to Question 2: A choice of K that balances between over-fitting and ignoring the predictor information is K = 1, which results in the highest accuracy reading at 0.965.</p>
+<pre class="r"><code># Create the KNN model with K = 1 and only training and test data
+
+knn_model2 &lt;- knn(train = ml_1_Train_Norm[, -6], test = ml_1_Test_Norm[, -6], 
+          cl = ml_1_Train_Norm[, 6], k = 1, prob = TRUE)
+
+# Confusion Matrix
+
+predicted &lt;- as.factor(knn_model2)
+actual &lt;- as.factor(ml_1_Test_Norm[, 6])
+
+confusionMatrix(predicted, actual, positive = &quot;1&quot;)</code></pre>
+<pre><code>## Confusion Matrix and Statistics
 ## 
-## 2999 samples
-##   13 predictor
-##    2 classes: &#39;0&#39;, &#39;1&#39; 
-## 
-## Pre-processing: scaled (13), centered (13) 
-## Resampling: Bootstrapped (25 reps) 
-## Summary of sample sizes: 2999, 2999, 2999, 2999, 2999, 2999, ... 
-## Resampling results:
-## 
-##   Accuracy   Kappa    
-##   0.9514634  0.7051565
-## 
-## Tuning parameter &#39;k&#39; was held constant at a value of 1</code></pre>
-<pre class="r"><code>#Confusion Matrix for the Test Set
-CrossTable(x=Test_targets, y=Test_Predictions, prop.chisq = FALSE)</code></pre>
-<pre><code>## 
-##  
-##    Cell Contents
-## |-------------------------|
-## |                       N |
-## |           N / Row Total |
-## |           N / Col Total |
-## |         N / Table Total |
-## |-------------------------|
-## 
-##  
-## Total Observations in Table:  2001 
-## 
-##  
-##              | Test_Predictions 
-## Test_targets |         0 |         1 | Row Total | 
-## -------------|-----------|-----------|-----------|
-##            0 |       279 |      1546 |      1825 | 
-##              |     0.153 |     0.847 |     0.912 | 
-##              |     0.748 |     0.950 |           | 
-##              |     0.139 |     0.773 |           | 
-## -------------|-----------|-----------|-----------|
-##            1 |        94 |        82 |       176 | 
-##              |     0.534 |     0.466 |     0.088 | 
-##              |     0.252 |     0.050 |           | 
-##              |     0.047 |     0.041 |           | 
-## -------------|-----------|-----------|-----------|
-## Column Total |       373 |      1628 |      2001 | 
-##              |     0.186 |     0.814 |           | 
-## -------------|-----------|-----------|-----------|
-## 
+##           Reference
+## Prediction    0    1
+##          0 1802   58
+##          1   13  128
+##                                           
+##                Accuracy : 0.9645          
+##                  95% CI : (0.9555, 0.9722)
+##     No Information Rate : 0.907           
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.764           
+##                                           
+##  Mcnemar&#39;s Test P-Value : 1.772e-07       
+##                                           
+##             Sensitivity : 0.68817         
+##             Specificity : 0.99284         
+##          Pos Pred Value : 0.90780         
+##          Neg Pred Value : 0.96882         
+##              Prevalence : 0.09295         
+##          Detection Rate : 0.06397         
+##    Detection Prevalence : 0.07046         
+##       Balanced Accuracy : 0.84050         
+##                                           
+##        &#39;Positive&#39; Class : 1               
 ## </code></pre>
-<pre class="r"><code>print(predictions_1st_Customer)</code></pre>
-<pre><code>## [1] 1
-## Levels: 0 1</code></pre>
-<p>#Response to Question 2: A choice of K that balances between over-fitting and ignoring the predictor information is K = 5., k Accuracy =&gt; 5 0.9556791, Kappa =&gt;0.6852176. See code and output below.</p>
-<pre class="r"><code>#2nd Model using a Search Procedure
-set.seed(15)
-#Search Grid, Training Sets, and Test Sets
-Search_grid &lt;- expand.grid(k=c(2:30))
-test_labels&lt;-Test_Data[,-10] 
-test_targets&lt;-Test_Data[,10]
-test_targets &lt;- sapply(test_targets, as.factor)
+<ol start="3" style="list-style-type: decimal">
+<li>Confusion matrix of the KNN model using K = 1.</li>
+</ol>
+<pre class="r"><code># Runing KNN model on the customer profile with K = 1 value
 
-train_labels &lt;- Train_Data[, -10]
-train_targets &lt;- Train_Data[, 10]
-train_targets &lt;- sapply(train_targets, as.factor)
+knn_model_customer2 &lt;- knn(train = ml_1_Train_Norm[, -6], test = customer, 
+          cl = ml_1_Train_Norm[, 6], k = 20, prob = TRUE)
 
-norm &lt;- preProcess(train_labels[, c(1, 2, 3, 4, 5, 9)], method=c(&quot;center&quot;, &quot;scale&quot;))
+# Return the value predicted by the model
 
-train_labels[, c(1, 2, 3, 4, 5, 9)] &lt;- predict(norm, train_labels[, c(1, 2, 3, 4, 5, 9)])
+as.data.frame(knn_model_customer2)</code></pre>
+<pre><code>##   knn_model_customer2
+## 1                   0</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>The prediction shows that this customer will still not accept the personal loan.</li>
+</ol>
+<p>Based on the problem statement, we will now split the data set into 50% training data, 30% validation data, and 20% test data using the “createDataPartition” function.</p>
+<pre class="r"><code># Set the seed for randomized functions
 
-#Model
-model&lt;-train(train_labels, train_targets, method=&quot;knn&quot;, tuneGrid=Search_grid)
+set.seed(100619)
 
-#Predictions Test Set
-predictions_test &lt;- predict(model, test_labels)
+# Split the data into 50% training data, 30% validation data, and 20% test data
 
-#Predictions 2nd Customer
-predictions_2nd_Customer &lt;- predict(model, Customer)
+ml_2_Index &lt;- createDataPartition(ml_1$Age, p=0.2, list = F)
 
-#Scores for the 2nd Model Test Set
-#Accuracy
-#accuracy(predictions_test, test_targets)
+ml_2_Test &lt;- ml_1[ml_2_Index,]
 
-model</code></pre>
-<pre><code>## k-Nearest Neighbors 
+ml_2_Remaining &lt;- ml_1[-ml_2_Index,] 
+
+ml_2_Index &lt;- createDataPartition(ml_2_Remaining$Age, p=0.625, list = F)
+
+ml_2_Train &lt;- ml_2_Remaining[ml_2_Index,]
+
+ml_2_Validation &lt;- ml_2_Train[-ml_2_Index,] </code></pre>
+<p>We will repeat the normalization process in this new divided data, just as we did before.</p>
+<pre class="r"><code># Create a copy of the data sets for normalization
+
+ml_2_Train_Norm &lt;- ml_2_Train
+ml_2_Test_Norm &lt;- ml_2_Test
+ml_2_Validation_Norm &lt;- ml_2_Validation
+
+# For centering and scaling the data we will create a model using preProcess function 
+
+Norm_Values &lt;- preProcess(ml_2_Train[, c(1:5)], method = c(&quot;center&quot;, &quot;scale&quot;))
+
+# Next we will now replace the numeric variables with the normalized and centered data
+
+ml_2_Train_Norm[, c(1:5)] &lt;- predict(Norm_Values, ml_2_Train[, c(1:5)])
+ml_2_Test_Norm[, c(1:5)] &lt;- predict(Norm_Values, ml_2_Test[, c(1:5)])
+ml_2_Validation_Norm[, c(1:5)] &lt;- predict(Norm_Values, ml_2_Validation[, c(1:5)])</code></pre>
+<p>Using the new divided data set,We will re-run the KNN model.</p>
+<ol start="5" style="list-style-type: decimal">
+<li>We expect the confusion matricies for the test data to have lower accuracy results because the data used had not been seen by the model while training it. But, we expect the confusion matrix for training data to be more accurate, because it has already seen the data that it is predicting. Based on our desire metric of comparison, we should compare the accuracy, precision, specificity and recall, or including any other metric of interest.</li>
+</ol>
+<p>First confusion matrix is for the “test” data:</p>
+<pre class="r"><code># Create the KNN model with K = 1
+
+knn_model_test &lt;- knn(train = ml_2_Train_Norm[, -6], test = ml_2_Test_Norm[, -6], 
+          cl = ml_2_Train_Norm[, 6], k = 1, prob = TRUE)
+
+# Confusion Matrix
+
+predicted_test &lt;- as.factor(knn_model_test)
+actual_test &lt;- as.factor(ml_2_Test_Norm[, 6])
+
+confusionMatrix(predicted_test, actual_test, positive = &quot;1&quot;)</code></pre>
+<pre><code>## Confusion Matrix and Statistics
 ## 
-## 2999 samples
-##   13 predictor
-##    2 classes: &#39;0&#39;, &#39;1&#39; 
-## 
-## No pre-processing
-## Resampling: Bootstrapped (25 reps) 
-## Summary of sample sizes: 2999, 2999, 2999, 2999, 2999, 2999, ... 
-## Resampling results across tuning parameters:
-## 
-##   k   Accuracy   Kappa    
-##    2  0.9528979  0.7100035
-##    3  0.9521720  0.6989213
-##    4  0.9524594  0.6963884
-##    5  0.9543461  0.7036920
-##    6  0.9529013  0.6895885
-##    7  0.9523575  0.6814386
-##    8  0.9520835  0.6750262
-##    9  0.9510352  0.6647725
-##   10  0.9494600  0.6502357
-##   11  0.9488017  0.6447132
-##   12  0.9479359  0.6364351
-##   13  0.9473918  0.6302630
-##   14  0.9459956  0.6169936
-##   15  0.9458356  0.6143647
-##   16  0.9438157  0.5955911
-##   17  0.9428090  0.5852244
-##   18  0.9422276  0.5792663
-##   19  0.9413221  0.5685707
-##   20  0.9407893  0.5638621
-##   21  0.9396722  0.5521952
-##   22  0.9387291  0.5428669
-##   23  0.9376416  0.5323047
-##   24  0.9368873  0.5241414
-##   25  0.9362348  0.5171970
-##   26  0.9354417  0.5083855
-##   27  0.9348654  0.5013258
-##   28  0.9345775  0.4984952
-##   29  0.9343628  0.4949472
-##   30  0.9334676  0.4856650
-## 
-## Accuracy was used to select the optimal model using the largest value.
-## The final value used for the model was k = 5.</code></pre>
-<pre class="r"><code>#Confusion Matrix for Test Set
-CrossTable(x=test_targets,y=predictions_test, prop.chisq = FALSE)</code></pre>
-<pre><code>## 
-##  
-##    Cell Contents
-## |-------------------------|
-## |                       N |
-## |           N / Row Total |
-## |           N / Col Total |
-## |         N / Table Total |
-## |-------------------------|
-## 
-##  
-## Total Observations in Table:  2001 
-## 
-##  
-##              | predictions_test 
-## test_targets |         0 |         1 | Row Total | 
-## -------------|-----------|-----------|-----------|
-##            0 |       260 |      1565 |      1825 | 
-##              |     0.142 |     0.858 |     0.912 | 
-##              |     0.730 |     0.951 |           | 
-##              |     0.130 |     0.782 |           | 
-## -------------|-----------|-----------|-----------|
-##            1 |        96 |        80 |       176 | 
-##              |     0.545 |     0.455 |     0.088 | 
-##              |     0.270 |     0.049 |           | 
-##              |     0.048 |     0.040 |           | 
-## -------------|-----------|-----------|-----------|
-## Column Total |       356 |      1645 |      2001 | 
-##              |     0.178 |     0.822 |           | 
-## -------------|-----------|-----------|-----------|
-## 
+##           Reference
+## Prediction   0   1
+##          0 898  25
+##          1   6  72
+##                                           
+##                Accuracy : 0.969           
+##                  95% CI : (0.9563, 0.9789)
+##     No Information Rate : 0.9031          
+##     P-Value [Acc &gt; NIR] : 4.834e-16       
+##                                           
+##                   Kappa : 0.8061          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.001225        
+##                                           
+##             Sensitivity : 0.74227         
+##             Specificity : 0.99336         
+##          Pos Pred Value : 0.92308         
+##          Neg Pred Value : 0.97291         
+##              Prevalence : 0.09690         
+##          Detection Rate : 0.07193         
+##    Detection Prevalence : 0.07792         
+##       Balanced Accuracy : 0.86782         
+##                                           
+##        &#39;Positive&#39; Class : 1               
 ## </code></pre>
-<pre class="r"><code>print(predictions_2nd_Customer)</code></pre>
-<pre><code>## [1] 1
-## Levels: 0 1</code></pre>
-<p>#Question3: Show the confusion matrix for the validation data that results from using the best k. The confusion matrix for this question is the last validation matrix table in the output below. #4. Using the best k, the customer would accept the loan, so he/she is in the loan acceptance class.#5. The model performs better on the training data for the best k of 5. Although, for the test and validation data the model ability to predict is very poor. Meaning that the ability of the model to perform in predicting the target is significantly reduced from the model’s performance on the training data. Please see RMD file for code and full r output for this responses.</p>
-<pre class="r"><code>set.seed(15)
-#Creating the Training, Testing, and Validation Sets
-Search_grid &lt;- expand.grid(k=c(5))
-Train_Index = createDataPartition(ml$Age,p=0.5, list=FALSE)
-train &lt;- ml[Train_Index,]
-train_targets &lt;- train[, 10]
-train_labels &lt;- train[, -10]
-train_targets &lt;- sapply(train_targets, as.factor)
+<p>Second confusion matrix is for the “validation” data:</p>
+<pre class="r"><code># Create the KNN model with K = 1
 
-Test_Val &lt;- ml[-Train_Index,]
-Test_Index = createDataPartition(Test_Val$Age,p=0.6, list=FALSE)
+knn_model_validation &lt;- knn(train = ml_2_Train_Norm[, -6], test = ml_2_Validation_Norm[, -6], 
+          cl = ml_2_Train_Norm[, 6], k = 1, prob = TRUE)
 
-valid &lt;- Test_Val[Test_Index,]
-valid_targets &lt;- valid[, 10]
-valid_labels &lt;- valid[, -10]
-valid_targets &lt;- sapply(valid_targets, as.factor)
+# Confusion Matrix
 
-test &lt;- Test_Val[-Test_Index,]
-test_targets &lt;- test[, 10]
-test_labels &lt;- test[, -10]
-test_targets &lt;- sapply(test_targets, as.factor)
+predicted_validation &lt;- as.factor(knn_model_validation)
+actual_validation &lt;- as.factor(ml_2_Validation_Norm[, 6])
 
-norm &lt;- preProcess(train_labels[, c(1, 2, 3, 4, 5, 9)], method=c(&quot;center&quot;, &quot;scale&quot;))
-
-train_labels[, c(1, 2, 3, 4, 5, 9)] &lt;- predict(norm, train_labels[, c(1, 2, 3, 4, 5, 9)])
-
-model&lt;-train(train_labels, train_targets, method=&quot;knn&quot;, tuneGrid=Search_grid)
-
-#Predictions 
-predictions_train &lt;- predict(model, train_labels)
-predictions_test &lt;- predict(model, test_labels)
-predictions_valid &lt;- predict(model, valid_labels)
-
-#Confusion Matrices
-CrossTable(x=train_targets,y=predictions_train, prop.chisq = FALSE)</code></pre>
-<pre><code>## 
-##  
-##    Cell Contents
-## |-------------------------|
-## |                       N |
-## |           N / Row Total |
-## |           N / Col Total |
-## |         N / Table Total |
-## |-------------------------|
+confusionMatrix(predicted_validation, actual_validation, positive = &quot;1&quot;)</code></pre>
+<pre><code>## Confusion Matrix and Statistics
 ## 
-##  
-## Total Observations in Table:  2501 
-## 
-##  
-##               | predictions_train 
-## train_targets |         0 |         1 | Row Total | 
-## --------------|-----------|-----------|-----------|
-##             0 |      1711 |        64 |      1775 | 
-##               |     0.964 |     0.036 |     0.710 | 
-##               |     0.934 |     0.096 |           | 
-##               |     0.684 |     0.026 |           | 
-## --------------|-----------|-----------|-----------|
-##             1 |       120 |       606 |       726 | 
-##               |     0.165 |     0.835 |     0.290 | 
-##               |     0.066 |     0.904 |           | 
-##               |     0.048 |     0.242 |           | 
-## --------------|-----------|-----------|-----------|
-##  Column Total |      1831 |       670 |      2501 | 
-##               |     0.732 |     0.268 |           | 
-## --------------|-----------|-----------|-----------|
-## 
+##           Reference
+## Prediction   0   1
+##          0 856   0
+##          1   0  92
+##                                      
+##                Accuracy : 1          
+##                  95% CI : (0.9961, 1)
+##     No Information Rate : 0.903      
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  
+##                                      
+##                   Kappa : 1          
+##                                      
+##  Mcnemar&#39;s Test P-Value : NA         
+##                                      
+##             Sensitivity : 1.00000    
+##             Specificity : 1.00000    
+##          Pos Pred Value : 1.00000    
+##          Neg Pred Value : 1.00000    
+##              Prevalence : 0.09705    
+##          Detection Rate : 0.09705    
+##    Detection Prevalence : 0.09705    
+##       Balanced Accuracy : 1.00000    
+##                                      
+##        &#39;Positive&#39; Class : 1          
 ## </code></pre>
-<pre class="r"><code>CrossTable(x=test_targets,y=predictions_test, prop.chisq = FALSE)</code></pre>
-<pre><code>## 
-##  
-##    Cell Contents
-## |-------------------------|
-## |                       N |
-## |           N / Row Total |
-## |           N / Col Total |
-## |         N / Table Total |
-## |-------------------------|
+<p>Third confusion matrix is for the “train” data:</p>
+<pre class="r"><code># Creating KNN model with K = 1
+
+knn_model_train &lt;- knn(train = ml_2_Train_Norm[, -6], test = ml_2_Train_Norm[, -6], 
+          cl = ml_2_Train_Norm[, 6], k = 1, prob = TRUE)
+
+# Confusion Matrix
+
+predicted_train &lt;- as.factor(knn_model_train)
+actual_train &lt;- as.factor(ml_2_Train_Norm[, 6])
+
+confusionMatrix(predicted_train, actual_train, positive = &quot;1&quot;)</code></pre>
+<pre><code>## Confusion Matrix and Statistics
 ## 
-##  
-## Total Observations in Table:  997 
-## 
-##  
-##              | predictions_test 
-## test_targets |         0 |         1 | Row Total | 
-## -------------|-----------|-----------|-----------|
-##            1 |       276 |        31 |       307 | 
-##              |     0.899 |     0.101 |     0.308 | 
-##              |     0.310 |     0.287 |           | 
-##              |     0.277 |     0.031 |           | 
-## -------------|-----------|-----------|-----------|
-##            0 |       613 |        77 |       690 | 
-##              |     0.888 |     0.112 |     0.692 | 
-##              |     0.690 |     0.713 |           | 
-##              |     0.615 |     0.077 |           | 
-## -------------|-----------|-----------|-----------|
-## Column Total |       889 |       108 |       997 | 
-##              |     0.892 |     0.108 |           | 
-## -------------|-----------|-----------|-----------|
-## 
+##           Reference
+## Prediction    0    1
+##          0 2250    0
+##          1    0  251
+##                                      
+##                Accuracy : 1          
+##                  95% CI : (0.9985, 1)
+##     No Information Rate : 0.8996     
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16  
+##                                      
+##                   Kappa : 1          
+##                                      
+##  Mcnemar&#39;s Test P-Value : NA         
+##                                      
+##             Sensitivity : 1.0000     
+##             Specificity : 1.0000     
+##          Pos Pred Value : 1.0000     
+##          Neg Pred Value : 1.0000     
+##              Prevalence : 0.1004     
+##          Detection Rate : 0.1004     
+##    Detection Prevalence : 0.1004     
+##       Balanced Accuracy : 1.0000     
+##                                      
+##        &#39;Positive&#39; Class : 1          
 ## </code></pre>
-<pre class="r"><code>CrossTable(x=valid_targets,y=predictions_valid, prop.chisq = FALSE)</code></pre>
-<pre><code>## 
-##  
-##    Cell Contents
-## |-------------------------|
-## |                       N |
-## |           N / Row Total |
-## |           N / Col Total |
-## |         N / Table Total |
-## |-------------------------|
-## 
-##  
-## Total Observations in Table:  1502 
-## 
-##  
-##               | predictions_valid 
-## valid_targets |         0 |         1 | Row Total | 
-## --------------|-----------|-----------|-----------|
-##             0 |       922 |       112 |      1034 | 
-##               |     0.892 |     0.108 |     0.688 | 
-##               |     0.684 |     0.723 |           | 
-##               |     0.614 |     0.075 |           | 
-## --------------|-----------|-----------|-----------|
-##             1 |       425 |        43 |       468 | 
-##               |     0.908 |     0.092 |     0.312 | 
-##               |     0.316 |     0.277 |           | 
-##               |     0.283 |     0.029 |           | 
-## --------------|-----------|-----------|-----------|
-##  Column Total |      1347 |       155 |      1502 | 
-##               |     0.897 |     0.103 |           | 
-## --------------|-----------|-----------|-----------|
-## 
-## </code></pre>
-</div>
+<p>The above confusion matricies shows that the predicted test data have a lower accuracy reading than the training data. Both the validation data and training data had an accuracy reading of 1.0; although, large amounts of normalized data do behave differently.</p>
 
 
 
